@@ -21,6 +21,7 @@ def make_maze(num, name):
         shuffle(d)
         for (xx, yy) in d:
             if vis[yy][xx]:
+                print(vis[yy][xx])
                 continue
             if xx == x:
                 hor[max(y, yy)][x] = "#."
