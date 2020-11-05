@@ -1,6 +1,9 @@
 from random import shuffle, choice
 from itertools import product
-import numpy as np
+import sys
+
+
+sys.setrecursionlimit(150000)
 
 
 def make_maze(num, name):
@@ -12,27 +15,32 @@ def make_maze(num, name):
         liste = []
         while len(liste) > 0:
             liste.pop()
-        for i in range(count, count+w):
+        for i in range(count, count + w):
             liste.append(i)
             count += 1
         vis.append(liste)
-
     controllist = list(product(range(w), repeat=2))
 
-    ver = [[".."]+["#."] * (w-1) + ['#']]+[["#."] * w + ['#']
-                                           for _ in range(w-2)]+[["#."] * (w) + ["."]] + [[]]
-    hor = [[".#"]+["##"] * (w-1) + ['#']]+[["##"] * w + ['#']
-                                           for _ in range(w-1)] + [["#"] * (2*w-1) + ['#.']]
+    ver = (
+        [[".."] + ["#."] * (w - 1) + ["#"]]
+        + [["#."] * w + ["#"] for _ in range(w - 2)]
+        + [["#."] * (w) + ["."]]
+        + [[]]
+    )
+    hor = (
+        [[".#"] + ["##"] * (w - 1) + ["#"]]
+        + [["##"] * w + ["#"] for _ in range(w - 1)]
+        + [["#"] * (2 * w - 1) + ["#."]]
+    )
 
     def debugPrint():
         s = ""
         for (a, b) in zip(hor, ver):
-            s += ''.join(a + ['\n'] + b + ['\n'])
+            s += "".join(a + ["\n"] + b + ["\n"])
         print(s)
 
     def counterzeros():
         if vis == vis2:
-            debugPrint()
             mazeWrite(name)
         else:
             return True
@@ -43,24 +51,42 @@ def make_maze(num, name):
                 if k < l:
                     if vis[i][j] == l:
                         vis[i][j] = k
+                        # controllist.remove((j, i))
+                        # if l == 0:
+                        try:
+                            controllist.remove((j, i))
+                        except:
+                            continue
                 else:
                     if vis[i][j] == k:
                         vis[i][j] = l
-        print("*"*20)
-        for line in vis:
-            print(line)
+                        # controllist.remove((j, i))
+                        # if k == 0:
+                        try:
+                            controllist.remove((j, i))
+                        except:
+                            continue
+                # try:
+                #     controllist.remove((j, i))
+                # except:
+                #     continue
+
+        # print("*" * 20)
+        # for line in vis:
+        #     print(line)
+        # debugPrint()
 
     def walk(x, y):
         while counterzeros():
             k = vis[y][x]
             d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
-            if (x+1) == w:
+            if (x + 1) == w:
                 d.remove((x + 1, y))
-            if (y+1) == w:
+            if (y + 1) == w:
                 d.remove((x, y + 1))
-            if (x-1) == -1:
+            if (x - 1) == -1:
                 d.remove((x - 1, y))
-            if (y-1) == -1:
+            if (y - 1) == -1:
                 d.remove((x, y - 1))
             shuffle(d)
             xx, yy = d[0]
@@ -80,17 +106,19 @@ def make_maze(num, name):
         s = ""
         ths = open(f"{name}.txt", "a")
         for (a, b) in zip(hor, ver):
-            s += ''.join(a + ['\n'] + b + ['\n'])
+            s += "".join(a + ["\n"] + b + ["\n"])
         ths.write(s)
         ths.close()
-        for line in vis:
-            print(line)
+        print(controllist)
+        debugPrint()
+        # for line in vis:
+        #     print(line)
         exit()
 
     (x, y) = choice(controllist)
     walk(x, y)
 
 
-num = int(input('Entrer la taille de maze: '))
-name = input('Entrer le nom de maze: ')
+num = int(input("Entrer la taille de maze: "))
+name = input("Entrer le nom de maze: ")
 make_maze(num, name)

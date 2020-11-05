@@ -1,4 +1,7 @@
 from random import shuffle, randrange
+import sys
+
+sys.setrecursionlimit(170000)
 
 
 def make_maze(num, name):
@@ -21,7 +24,6 @@ def make_maze(num, name):
         shuffle(d)
         for (xx, yy) in d:
             if vis[yy][xx]:
-                print(vis[yy][xx])
                 continue
             if xx == x:
                 hor[max(y, yy)][x] = "#."
