@@ -3,7 +3,7 @@ from itertools import product
 import sys
 
 
-sys.setrecursionlimit(150000)
+sys.setrecursionlimit(10**9)
 
 
 def make_maze(num, name):
