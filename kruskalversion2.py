@@ -1,16 +1,19 @@
-from random import shuffle, choice
+from random import choice
 from itertools import product
 import sys
 import copy
+import faulthandler
 
-
-sys.setrecursionlimit(10**9)
+faulthandler.enable()
+sys.setrecursionlimit(10 ** 9)
 
 
 def make_maze(num, name):
     w = num
+    m = w*w
     vis = []
-    vis2 = [[0] * w for _ in range(w)]
+    vis2 = [m//5, m*35//100, m//2, m*65//100,
+            m*75//100, m*85//100, m*9//10, m*95//100]
     count = 0
     for i in range(0, w):
         liste = []
@@ -21,6 +24,8 @@ def make_maze(num, name):
             count += 1
         vis.append(liste)
 
+    idmatrix = list(product(range(0, w), range(0, w)))
+    dictionary = dict(zip(list(range(m)), idmatrix))
     listofwalls = list(product(range(0, w - 1), range(0, w - 1), range(2)))
     for i in range(w - 1):
         listofwalls.append(((w - 1), i, 0))
@@ -44,17 +49,6 @@ def make_maze(num, name):
             s += "".join(a + ["\n"] + b + ["\n"])
         print(s)
 
-    def counterzeros():
-        if vis == vis2:
-            mazeWrite(name)
-        else:
-            # for line in vis:
-            #     print(line)
-            # print(listofwalls)
-            # debugPrint()
-            (x, y, vh) = choice(listofwalls)
-            walk(x, y, vh)
-
     def cellidchanger(l, k):
         for i in range(w):
             for j in range(w):
@@ -65,21 +59,40 @@ def make_maze(num, name):
 
                     if vis[i][j] == k:
                         vis[i][j] = l
-        wallcleaner()
 
     def walk(x, y, vh):
-        k = vis[y][x]
-        if vh == 0:
-            l = vis[y + 1][x]
-        else:
-            l = vis[y][x + 1]
-        if l == k:
-            wallcleaner()
-        elif vh == 0:
-            hor[y + 1][x] = "#."
-        else:
-            ver[y][x + 1] = ".."
-        cellidchanger(l, k)
+        i = 0
+        while i < w**2:
+            j = len(listofwalls)
+            if j > 0:
+                (x, y, vh) = choice(listofwalls)
+                k = vis[y][x]
+                if vh == 0:
+                    l = vis[y + 1][x]
+                else:
+                    l = vis[y][x + 1]
+                if l == k:
+                    try:
+                        listofwalls.remove((x, y, vh))
+                    except:
+                        continue
+                elif vh == 0:
+                    hor[y + 1][x] = "#."
+                    i = i+1
+                else:
+                    ver[y][x + 1] = ".."
+                    i = i+1
+                cellidchanger(l, k)
+                try:
+                    listofwalls.remove((x, y, vh))
+                except:
+                    continue
+                if i in vis2:
+                    wallcleaner()
+            else:
+                debugPrint()
+                mazeWrite(name)
+                break
 
     def wallcleaner():
         liste = copy.deepcopy(listofwalls)
@@ -91,7 +104,7 @@ def make_maze(num, name):
                 if k == l:
                     try:
                         listofwalls.remove((j, i, 1))
-                        # print(j, i, 1, 'erased')
+                        print(j, i, 1, "erased")
                     except:
                         continue
             except:
@@ -103,12 +116,11 @@ def make_maze(num, name):
                 if k == m:
                     try:
                         listofwalls.remove((j, i, 0))
-                        # print(j, i, 0, 'erased')
+                        print(j, i, 0, "erased")
                     except:
                         continue
             except:
                 continue
-        counterzeros()
 
     def mazeWrite(name):
         s = ""
@@ -117,14 +129,15 @@ def make_maze(num, name):
             s += "".join(a + ["\n"] + b + ["\n"])
         ths.write(s)
         ths.close()
-        print(listofwalls)
-        debugPrint()
-        for line in vis:
-            print(line)
+        # print(listofwalls)
+        # debugPrint()
+        # for line in vis:
+        #     print(line)
         exit()
 
     (x, y, vh) = choice(listofwalls)
     walk(x, y, vh)
+    mazeWrite(name)
 
 
 num = int(input("Entrer la taille de maze: "))

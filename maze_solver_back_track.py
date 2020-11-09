@@ -1,6 +1,10 @@
 import sys
+import os
+import faulthandler
 
-sys.setrecursionlimit(10**9)
+faulthandler.enable()
+os.system("cls")
+sys.setrecursionlimit(10 ** 9)
 
 
 def mazesolverBacktrack(name):
@@ -42,23 +46,36 @@ def mazesolverBacktrack(name):
 
     def valid(i, j):
         return (i >= 0 and i <= (len(matrix) - 1)) and (
-            j >= 0 and j <= (len(matrix) - 1))
+            j >= 0 and j <= (len(matrix) - 1)
+        )
+
     backtrack(0, 0)
     if len(solution) == 0:
         print("no path found!")
     for path in solution:
         for coordonnee in path:
             (x, y) = coordonnee
-            matrix[x][y] = "o"
+            matrix[x][y] = "\u001b[31mo\u001b[37m"
+            # matrix[x][y] = "o"
 
-   #  for i in range(len(matrix)):
-   #      for j in range(len(matrix)):
-   #          if matrix[i][j] == ".":
-   #              matrix[i][j] = "*"
+    #  for i in range(len(matrix)):
+    #      for j in range(len(matrix)):
+    #          if matrix[i][j] == ".":
+    #              matrix[i][j] = "*"
 
     for line in matrix:
         line = "".join(line)
         print(line)
+
+    def mazeWrite(name):
+        s = ""
+        ths = open(f"{name}solution.txt", "a")
+        for line in matrix:
+            s += "".join(line + ["\n"])
+        ths.write(s)
+        ths.close()
+
+    # mazeWrite(name)
 
 
 name = input("Entrer le nom de maze: ")
