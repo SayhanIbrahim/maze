@@ -24,8 +24,6 @@ def make_maze(num, name):
             count += 1
         vis.append(liste)
 
-    idmatrix = list(product(range(0, w), range(0, w)))
-    dictionary = dict(zip(list(range(m)), idmatrix))
     listofwalls = list(product(range(0, w - 1), range(0, w - 1), range(2)))
     for i in range(w - 1):
         listofwalls.append(((w - 1), i, 0))
@@ -49,70 +47,29 @@ def make_maze(num, name):
             s += "".join(a + ["\n"] + b + ["\n"])
         print(s)
 
-    def cellidchanger2(l, k):
-        element1 = dictionary[k]
-        element2 = dictionary[l]
-        liste = []
-        if k < l:
-            if type(element1) is list:
-                for i in range(len(element1)):
-                    z = element1[i]
-                    liste.append(z)
-            else:
-                liste.append(dictionary[k])
-            if type(element2) is list:
-                for i in range(len(element2)):
-                    z = element2[i]
-                    liste.append(z)
-            else:
-                liste.append(dictionary[l])
-            dictionary[k] = liste
-            del dictionary[l]
-        else:
-            if type(element1) is list:
-                for i in range(len(element1)):
-                    z = element1[i]
-                    liste.append(z)
-            else:
-                liste.append(dictionary[k])
-            if type(element2) is list:
-                for i in range(len(element2)):
-                    z = element2[i]
-                    liste.append(z)
-            else:
-                liste.append(dictionary[l])
-            dictionary[l] = liste
-            del dictionary[k]
+    def cellidchanger(l, k):
+        for i in range(w):
+            for j in range(w):
+                if k < l:
+                    if vis[i][j] == l:
+                        vis[i][j] = k
+                else:
 
-    def valuefinder(x, y):
-        val_list = copy.deepcopy(list(dictionary.values()))
-        key_list = copy.deepcopy(list(dictionary.keys()))
-        for l in val_list:
-            if type(l) is list:
-                for i in range(len(l)):
-                    if ((x, y)) in l:
-                        indis = val_list.index(l)
-                        idnumber = key_list[indis]
-                        return(idnumber)
-                        break
-            elif l == (x, y):
-                indis = val_list.index(l)
-                idnumber = key_list[indis]
-                return(idnumber)
-                break
+                    if vis[i][j] == k:
+                        vis[i][j] = l
 
     def walk(x, y, vh):
         i = 0
         while i < w**2:
-            j = len(dictionary)
-            print('len of dictionary:', j)
+            j = len(listofwalls)
+            print('len of list of walls', j)
             if j > 1:
                 (x, y, vh) = choice(listofwalls)
-                k = valuefinder(x, y)
+                k = vis[y][x]
                 if vh == 0:
-                    l = valuefinder(x, y+1)
+                    l = vis[y + 1][x]
                 else:
-                    l = valuefinder(x+1, y)
+                    l = vis[y][x + 1]
                 if l == k:
                     try:
                         listofwalls.remove((x, y, vh))
@@ -120,44 +77,46 @@ def make_maze(num, name):
                         continue
                 elif vh == 0:
                     hor[y + 1][x] = "#."
-                    cellidchanger2(l, k)
+                    cellidchanger(l, k)
                     i = i+1
                 else:
                     ver[y][x + 1] = ".."
-                    cellidchanger2(l, k)
+                    cellidchanger(l, k)
                     i = i+1
                 try:
                     listofwalls.remove((x, y, vh))
                 except:
                     continue
+                if i in vis2:
+                    wallcleaner()
             else:
                 debugPrint()
                 mazeWrite(name)
                 break
 
-    def wallcleaner2():
+    def wallcleaner():
         liste = copy.deepcopy(listofwalls)
         # print(len(liste))
-        for (x, y, vh) in liste:
-            k = valuefinder(x, y)
+        for (j, i, vh) in liste:
+            k = vis[i][j]
             try:
-                l = valuefinder(x+1, y)
+                l = vis[i][j + 1]
                 if k == l:
                     try:
-                        listofwalls.remove((x, y, 1))
-                        print(x, y, 1, "erased")
+                        listofwalls.remove((j, i, 1))
+                        print(j, i, 1, "erased")
                     except:
                         continue
             except:
                 continue
-        for (x, y, vh) in liste:
-            k = valuefinder(x, y)
+        for (j, i, vh) in liste:
+            k = vis[i][j]
             try:
-                m = valuefinder(x, y+1)
+                m = vis[i + 1][j]
                 if k == m:
                     try:
-                        listofwalls.remove((x, y, 0))
-                        print(x, y, 0, "erased")
+                        listofwalls.remove((j, i, 0))
+                        print(j, i, 0, "erased")
                     except:
                         continue
             except:
@@ -168,11 +127,10 @@ def make_maze(num, name):
         ths = open(f"{name}.txt", "a")
         for (a, b) in zip(hor, ver):
             s += "".join(a + ["\n"] + b + ["\n"])
-        print(dictionary)
         ths.write(s)
         ths.close()
         # print(listofwalls)
-        debugPrint()
+        # debugPrint()
         # for line in vis:
         #     print(line)
         exit()
