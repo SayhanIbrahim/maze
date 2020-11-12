@@ -3,6 +3,8 @@ from itertools import product
 import sys
 import copy
 import faulthandler
+from PIL import Image, ImageDraw
+
 
 faulthandler.enable()
 sys.setrecursionlimit(10 ** 9)
@@ -62,7 +64,7 @@ def make_maze(num, name):
         i = 0
         while i < w**2:
             j = len(listofwalls)
-            print('len of list of walls', j)
+            # print('len of list of walls', j)
             if j > 1:
                 (x, y, vh) = choice(listofwalls)
                 k = vis[y][x]
@@ -104,7 +106,7 @@ def make_maze(num, name):
                 if k == l:
                     try:
                         listofwalls.remove((j, i, 1))
-                        print(j, i, 1, "erased")
+                        # print(j, i, 1, "erased")
                     except:
                         continue
             except:
@@ -116,7 +118,7 @@ def make_maze(num, name):
                 if k == m:
                     try:
                         listofwalls.remove((j, i, 0))
-                        print(j, i, 0, "erased")
+                        # print(j, i, 0, "erased")
                     except:
                         continue
             except:
@@ -129,11 +131,36 @@ def make_maze(num, name):
             s += "".join(a + ["\n"] + b + ["\n"])
         ths.write(s)
         ths.close()
+        createJPG()
         # print(listofwalls)
         # debugPrint()
         # for line in vis:
         #     print(line)
         exit()
+
+    def createJPG():
+        large = 15*(w)
+        img = Image.new('RGB', (large, large), (255, 255, 255))
+        t = large//w
+        draw = ImageDraw.Draw(img)
+        draw.line((large-2, 0, large-2, large-2), fill=(0, 0, 0), width=3)
+        draw.line((0, large-2, large-2, large-2), fill=(0, 0, 0), width=3)
+        draw.line((0, 0, large-2, 0), fill=(0, 0, 0), width=3)
+        draw.line((0, 0, 0, large-2), fill=(0, 0, 0), width=3)
+
+        for y in range(w):
+            for x in range(w):
+                try:
+                    if ver[y][x] == "#.":
+                        draw.line((t*x, t*y, t*x, t*y+t),
+                                  fill=(0, 0, 0), width=3)
+                    if hor[y][x] == "##":
+                        draw.line((t*x, t*y, t*x+t, t*y),
+                                  fill=(0, 0, 0), width=3)
+                except:
+                    pass
+        img.show()
+        img.save(f"{name}.jpg")
 
     (x, y, vh) = choice(listofwalls)
     walk(x, y, vh)
