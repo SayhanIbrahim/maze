@@ -98,7 +98,7 @@ def make_maze(num, name):
 
     def wallcleaner():
         liste = copy.deepcopy(listofwalls)
-        # print(len(liste))
+        print(len(liste))
         for (j, i, vh) in liste:
             k = vis[i][j]
             try:
@@ -134,29 +134,29 @@ def make_maze(num, name):
         createJPG()
         # print(listofwalls)
         # debugPrint()
-        # for line in vis:
-        #     print(line)
+        for line in vis:
+            print(line)
         exit()
 
     def createJPG():
-        large = 15*(w)
+        large = 3*(w)
         img = Image.new('RGB', (large, large), (255, 255, 255))
         t = large//w
         draw = ImageDraw.Draw(img)
-        draw.line((large-2, 0, large-2, large-2), fill=(0, 0, 0), width=3)
-        draw.line((0, large-2, large-2, large-2), fill=(0, 0, 0), width=3)
-        draw.line((0, 0, large-2, 0), fill=(0, 0, 0), width=3)
-        draw.line((0, 0, 0, large-2), fill=(0, 0, 0), width=3)
+        draw.line((large-2, 0, large-2, large-2), fill=(0, 0, 0), width=1)
+        draw.line((0, large-2, large-2, large-2), fill=(0, 0, 0), width=1)
+        draw.line((0, 0, large-2, 0), fill=(0, 0, 0), width=1)
+        draw.line((0, 0, 0, large-2), fill=(0, 0, 0), width=1)
 
         for y in range(w):
             for x in range(w):
                 try:
                     if ver[y][x] == "#.":
                         draw.line((t*x, t*y, t*x, t*y+t),
-                                  fill=(0, 0, 0), width=3)
+                                  fill=(0, 0, 0), width=1)
                     if hor[y][x] == "##":
                         draw.line((t*x, t*y, t*x+t, t*y),
-                                  fill=(0, 0, 0), width=3)
+                                  fill=(0, 0, 0), width=1)
                 except:
                     pass
         img.show()

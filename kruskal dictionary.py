@@ -1,14 +1,12 @@
+import time
 from random import choice
 from itertools import product
-import sys
 import copy
-import faulthandler
-
-faulthandler.enable()
-sys.setrecursionlimit(10 ** 9)
+from PIL import Image, ImageDraw
 
 
 def make_maze(num, name):
+    print("Start : %s" % time.ctime())
     w = num
     m = w*w
     vis = []
@@ -28,9 +26,8 @@ def make_maze(num, name):
     dictionary = dict(zip(list(range(m)), idmatrix))
     listofwalls = list(product(range(0, w - 1), range(0, w - 1), range(2)))
     for i in range(w - 1):
-        listofwalls.append(((w - 1), i, 0))
-        listofwalls.append((i, (w - 1), 1))
-
+        listofwalls.append(((w-1), i, 0))
+        listofwalls.append((i, (w-1), 1))
     ver = (
         [[".."] + ["#."] * (w - 1) + ["#"]]
         + [["#."] * w + ["#"] for _ in range(w - 2)]
@@ -42,6 +39,7 @@ def make_maze(num, name):
         + [["##"] * w + ["#"] for _ in range(w - 1)]
         + [["#"] * (2 * w - 1) + ["#."]]
     )
+    print("Matrix created")
 
     def debugPrint():
         s = ""
@@ -63,17 +61,31 @@ def make_maze(num, name):
             if type(element2) is list:
                 for i in range(len(element2)):
                     z = element2[i]
+                    x = z[0]
+                    y = z[1]
+                    vis[x][y] = k
                     liste.append(z)
             else:
                 liste.append(dictionary[l])
+                z = dictionary[l]
+                x = z[0]
+                y = z[1]
+                vis[x][y] = k
             dictionary[k] = liste
             del dictionary[l]
         else:
             if type(element1) is list:
                 for i in range(len(element1)):
                     z = element1[i]
+                    x = z[0]
+                    y = z[1]
+                    vis[x][y] = l
                     liste.append(z)
             else:
+                z = dictionary[k]
+                x = z[0]
+                y = z[1]
+                vis[x][y] = l
                 liste.append(dictionary[k])
             if type(element2) is list:
                 for i in range(len(element2)):
@@ -83,36 +95,21 @@ def make_maze(num, name):
                 liste.append(dictionary[l])
             dictionary[l] = liste
             del dictionary[k]
-
-    def valuefinder(x, y):
-        val_list = copy.deepcopy(list(dictionary.values()))
-        key_list = copy.deepcopy(list(dictionary.keys()))
-        for l in val_list:
-            if type(l) is list:
-                for i in range(len(l)):
-                    if ((x, y)) in l:
-                        indis = val_list.index(l)
-                        idnumber = key_list[indis]
-                        return(idnumber)
-                        break
-            elif l == (x, y):
-                indis = val_list.index(l)
-                idnumber = key_list[indis]
-                return(idnumber)
-                break
+        # print(dictionary)
+        # for line in vis:
+        #     print(line)
+        # debugPrint()
 
     def walk(x, y, vh):
         i = 0
         while i < w**2:
-            j = len(dictionary)
-            print('len of dictionary:', j)
-            if j > 1:
+            if len(listofwalls) > 0:
                 (x, y, vh) = choice(listofwalls)
-                k = valuefinder(x, y)
+                k = vis[y][x]
                 if vh == 0:
-                    l = valuefinder(x, y+1)
+                    l = vis[y + 1][x]
                 else:
-                    l = valuefinder(x+1, y)
+                    l = vis[y][x + 1]
                 if l == k:
                     try:
                         listofwalls.remove((x, y, vh))
@@ -130,56 +127,86 @@ def make_maze(num, name):
                     listofwalls.remove((x, y, vh))
                 except:
                     continue
+                if i in vis2:
+                    wallcleaner()
             else:
-                debugPrint()
+                # debugPrint()
                 mazeWrite(name)
-                break
+        else:
+            # debugPrint()
+            mazeWrite(name)
 
-    def wallcleaner2():
+    def wallcleaner():
         liste = copy.deepcopy(listofwalls)
-        # print(len(liste))
-        for (x, y, vh) in liste:
-            k = valuefinder(x, y)
+        # print("1", len(listofwalls))
+        for (j, i, vh) in liste:
+            k = vis[i][j]
             try:
-                l = valuefinder(x+1, y)
+                l = vis[i][j + 1]
                 if k == l:
                     try:
-                        listofwalls.remove((x, y, 1))
-                        print(x, y, 1, "erased")
+                        listofwalls.remove((j, i, 1))
+                        # print(j, i, 1, "erased")
                     except:
                         continue
             except:
                 continue
-        for (x, y, vh) in liste:
-            k = valuefinder(x, y)
+        for (j, i, vh) in liste:
+            k = vis[i][j]
             try:
-                m = valuefinder(x, y+1)
+                m = vis[i + 1][j]
                 if k == m:
                     try:
-                        listofwalls.remove((x, y, 0))
-                        print(x, y, 0, "erased")
+                        listofwalls.remove((j, i, 0))
+                        # print(j, i, 0, "erased")
                     except:
                         continue
             except:
                 continue
+        # print("2", len(listofwalls))
 
     def mazeWrite(name):
+        print("End : %s" % time.ctime())
         s = ""
         ths = open(f"{name}.txt", "a")
         for (a, b) in zip(hor, ver):
             s += "".join(a + ["\n"] + b + ["\n"])
-        print(dictionary)
+        # print(dictionary)
         ths.write(s)
         ths.close()
+        createJPG()
         # print(listofwalls)
-        debugPrint()
+        # debugPrint()
         # for line in vis:
         #     print(line)
         exit()
 
+    def createJPG():
+        large = 3*(w)
+        img = Image.new('RGB', (large, large), (255, 255, 255))
+        t = large//w
+        draw = ImageDraw.Draw(img)
+        draw.line((large-1, 0, large-1, large), fill=(0, 0, 0), width=1)
+        draw.line((0, large-1, large, large-1), fill=(0, 0, 0), width=1)
+        draw.line((0, 0, large, 0), fill=(0, 0, 0), width=1)
+        draw.line((0, 0, 0, large), fill=(0, 0, 0), width=1)
+
+        for y in range(w):
+            for x in range(w):
+                try:
+                    if ver[y][x] == "#.":
+                        draw.line((t*x, t*y, t*x, t*y+t),
+                                  fill=(0, 0, 0), width=1)
+                    if hor[y][x] == "##":
+                        draw.line((t*x, t*y, t*x+t, t*y),
+                                  fill=(0, 0, 0), width=1)
+                except:
+                    pass
+        img.show()
+        img.save(f"{name}.jpg")
+
     (x, y, vh) = choice(listofwalls)
     walk(x, y, vh)
-    mazeWrite(name)
 
 
 num = int(input("Entrer la taille de maze: "))
