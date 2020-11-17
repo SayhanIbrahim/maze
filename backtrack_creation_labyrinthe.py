@@ -49,24 +49,21 @@ def construire_labyrinthe(taille, nom):
                     visited[xx][yy] = 1
 
     def ecrire_fichier_sortie(nom):
+        print("End : %s" % time.ctime())
         s = ""
         ths = open(f"{nom}.txt", "a")
         for (a, b) in zip(hor, ver):
             s += ''.join(a + ['\n'] + b + ['\n'])
         ths.write(s)
         ths.close()
-        createJPG()
-    creer_labyrinthe(randrange(taille), randrange(taille))
-    Afficher()
-    ecrire_fichier_sortie(nom)
 
     def createJPG():
         large = 3*(taille)
         img = Image.new('RGB', (large, large), (255, 255, 255))
         t = large//taille
         draw = ImageDraw.Draw(img)
-        draw.line((large-1, 0, large-1, large-1), fill=(0, 0, 0), width=1)
-        draw.line((0, large-2, large-1, large-1), fill=(0, 0, 0), width=1)
+        draw.line((large-1, 0, large-1, large), fill=(0, 0, 0), width=1)
+        draw.line((0, large-1, large, large-1), fill=(0, 0, 0), width=1)
         draw.line((0, 0, large-1, 0), fill=(0, 0, 0), width=1)
         draw.line((0, 0, 0, large-1), fill=(0, 0, 0), width=1)
 
@@ -83,9 +80,12 @@ def construire_labyrinthe(taille, nom):
                     pass
         img.show()
         img.save(f"{nom}.jpg")
+    creer_labyrinthe(randrange(taille), randrange(taille))
+    # Afficher()
+    ecrire_fichier_sortie(nom)
+    createJPG()
 
 
 taille = int(input('Entrer la taille de maze: '))
 nom = input('Entrer le nom de maze: ')
 construire_labyrinthe(taille, nom)
-print("End : %s" % time.ctime())

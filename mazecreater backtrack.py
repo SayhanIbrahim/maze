@@ -49,6 +49,7 @@ def construire_labyrinthe(taille, nom):
                     visited[xx][yy] = 1
 
     def ecrire_fichier_sortie(nom):
+        print("End : %s" % time.ctime())
         s = ""
         ths = open(f"{nom}.txt", "a")
         for (a, b) in zip(hor, ver):
@@ -89,4 +90,3 @@ def construire_labyrinthe(taille, nom):
 taille = int(input('Entrer la taille de maze: '))
 nom = input('Entrer le nom de maze: ')
 construire_labyrinthe(taille, nom)
-print("End : %s" % time.ctime())
