@@ -103,8 +103,8 @@ def mazesolverBacktrack(name):
 
                 except:
                     pass
-        img.show()
         img.save(f"{name} solution.jpg")
+        img.show()
 
     print("End : %s" % time.ctime())
     mazeWrite(name)

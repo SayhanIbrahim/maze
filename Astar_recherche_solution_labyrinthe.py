@@ -130,8 +130,8 @@ def Astar(name):
 
                 except:
                     pass
-        img.show()
         img.save(f"{name} Astar solution.jpg")
+        img.show()
 
     print("End : %s" % time.ctime())
     mazeWrite(name)

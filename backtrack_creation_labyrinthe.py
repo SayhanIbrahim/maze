@@ -78,8 +78,9 @@ def construire_labyrinthe(taille, nom):
                                   fill=(0, 0, 0), width=1)
                 except:
                     pass
-        img.show()
         img.save(f"{nom}.jpg")
+        img.show()
+
     creer_labyrinthe(randrange(taille), randrange(taille))
     # Afficher()
     ecrire_fichier_sortie(nom)

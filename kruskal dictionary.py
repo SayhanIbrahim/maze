@@ -10,8 +10,7 @@ def make_maze(num, name):
     w = num
     m = w*w
     vis = []
-    vis2 = [m//5, m*35//100, m//2, m*65//100,
-            m*75//100, m*85//100, m*9//10, m*95//100]
+    vis2 = [m*65//100, m*9//10]
     count = 0
     for i in range(0, w):
         liste = []
@@ -22,8 +21,8 @@ def make_maze(num, name):
             count += 1
         vis.append(liste)
 
-    idmatrix = list(product(range(0, w), range(0, w)))
-    dictionary = dict(zip(list(range(m)), idmatrix))
+    coordinatematrix = list(product(range(0, w), range(0, w)))
+    dictionary = dict(zip(list(range(m)), coordinatematrix))
     listofwalls = list(product(range(0, w - 1), range(0, w - 1), range(2)))
     for i in range(w - 1):
         listofwalls.append(((w-1), i, 0))
@@ -95,7 +94,7 @@ def make_maze(num, name):
                 liste.append(dictionary[l])
             dictionary[l] = liste
             del dictionary[k]
-        # print(dictionary)
+        print(dictionary)
         # for line in vis:
         #     print(line)
         # debugPrint()
@@ -127,8 +126,8 @@ def make_maze(num, name):
                     listofwalls.remove((x, y, vh))
                 except:
                     continue
-                if i in vis2:
-                    wallcleaner()
+                # if i in vis2:
+                #     wallcleaner()
             else:
                 # debugPrint()
                 mazeWrite(name)
@@ -168,7 +167,7 @@ def make_maze(num, name):
     def mazeWrite(name):
         print("End : %s" % time.ctime())
         s = ""
-        ths = open(f"{name}.txt", "a")
+        ths = open(f"{name} kruskal.txt", "a")
         for (a, b) in zip(hor, ver):
             s += "".join(a + ["\n"] + b + ["\n"])
         # print(dictionary)
@@ -202,8 +201,8 @@ def make_maze(num, name):
                                   fill=(0, 0, 0), width=1)
                 except:
                     pass
-        img.show()
         img.save(f"{name}.jpg")
+        img.show()
 
     (x, y, vh) = choice(listofwalls)
     walk(x, y, vh)
